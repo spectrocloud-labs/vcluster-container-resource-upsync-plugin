@@ -2,7 +2,7 @@ version: v2beta1
 name: container-resource-upsync
 
 vars:
-  PLUGIN_IMAGE: tylergillson/vcluster-container-resource-upsync-plugin
+  PLUGIN_IMAGE: quay.io/spectrocloud-labs/vcluster-container-resource-upsync-plugin
   K3S_IMAGE: rancher/k3s:v1.23.5-k3s1
   SERVICE_CIDR: $( vcluster get service-cidr )
   DEVSPACE_FLAGS: "-n vcluster"

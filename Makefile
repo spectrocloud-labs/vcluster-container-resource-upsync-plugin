@@ -12,7 +12,7 @@ GOARCH ?= $(shell go env GOARCH)
 GOPATH ?= $(shell go env GOPATH)
 
 IMG_TAG ?= "latest"
-IMG_NAME ?= "tylergillson/vcluster-container-resource-upsync-plugin:${IMG_TAG}"
+IMG_NAME ?= "quay.io/spectrocloud-labs/vcluster-container-resource-upsync-plugin:${IMG_TAG}"
 
 GOLANGCI_VERSION ?= 1.46.2
 
