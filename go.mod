@@ -1,4 +1,4 @@
-module github.com/TylerGillson/vcluster-container-resource-upsync
+module github.com/spectrocloud-labs/vcluster-container-resource-upsync
 
 go 1.19
 
