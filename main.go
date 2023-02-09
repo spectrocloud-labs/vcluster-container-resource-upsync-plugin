@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/TylerGillson/vcluster-sdk/plugin"
+	"github.com/loft-sh/vcluster-sdk/plugin"
 	"github.com/spectrocloud-labs/vcluster-container-resource-upsync/syncers"
 )
 

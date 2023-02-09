@@ -67,6 +67,11 @@ type DeleteAllOfOption interface {
 	ApplyToDeleteAllOf(*DeleteAllOfOptions)
 }
 
+// SubResourceGetOption modifies options for a SubResource Get request.
+type SubResourceGetOption interface {
+	ApplyToSubResourceGet(*SubResourceGetOptions)
+}
+
 // SubResourceUpdateOption is some configuration that modifies options for a update request.
 type SubResourceUpdateOption interface {
 	// ApplyToSubResourceUpdate applies this configuration to the given update options.
@@ -146,6 +151,21 @@ func (f FieldOwner) ApplyToCreate(opts *CreateOptions) {
 
 // ApplyToUpdate applies this configuration to the given update options.
 func (f FieldOwner) ApplyToUpdate(opts *UpdateOptions) {
+	opts.FieldManager = string(f)
+}
+
+// ApplyToSubResourcePatch applies this configuration to the given patch options.
+func (f FieldOwner) ApplyToSubResourcePatch(opts *SubResourcePatchOptions) {
+	opts.FieldManager = string(f)
+}
+
+// ApplyToSubResourceCreate applies this configuration to the given create options.
+func (f FieldOwner) ApplyToSubResourceCreate(opts *SubResourceCreateOptions) {
+	opts.FieldManager = string(f)
+}
+
+// ApplyToSubResourceUpdate applies this configuration to the given update options.
+func (f FieldOwner) ApplyToSubResourceUpdate(opts *SubResourceUpdateOptions) {
 	opts.FieldManager = string(f)
 }
 
