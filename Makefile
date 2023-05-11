@@ -73,7 +73,7 @@ test: test-unit gocovmerge gocover ## Run unit tests and generate a test report
 docker: docker-build docker-push ## Tags docker image and also pushes it to container registry
 
 docker-build: ## Builds docker image
-	docker build . -t ${IMG_NAME} -f ./Dockerfile
+	docker build . --platform=linux/amd64 -t ${IMG_NAME} -f ./Dockerfile
 
 docker-push: ## Pushes docker image to container registry
 	docker push ${IMG_NAME}
