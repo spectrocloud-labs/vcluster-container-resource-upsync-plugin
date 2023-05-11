@@ -82,10 +82,10 @@ func (s *containerResourceSyncer) updateContainerResources(pObj, vObj *corev1.Po
 	b := &monotonicBool{}
 	for i, c := range pObj.Spec.Containers {
 		limits := vObj.Spec.Containers[i].Resources.Limits
-		cpu := fmt.Sprintf("hostCluster.limits.%s.cpu", c.Name)
-		memory := fmt.Sprintf("hostCluster.limits.%s.memory", c.Name)
-		storage := fmt.Sprintf("hostCluster.limits.%s.storage", c.Name)
-		ephemeralStorage := fmt.Sprintf("hostCluster.limits.%s.ephemeral-storage", c.Name)
+		cpu := fmt.Sprintf("limits.cpu.%s", c.Name)
+		memory := fmt.Sprintf("limits.memory.%s", c.Name)
+		storage := fmt.Sprintf("limits.storage.%s", c.Name)
+		ephemeralStorage := fmt.Sprintf("limits.ephemeral-storage.%s", c.Name)
 
 		if limits == nil || limits.Cpu() == nil || limits.Cpu().IsZero() {
 			updateMap(updated.Annotations, cpu, c.Resources.Limits.Cpu().String(), b)
@@ -101,10 +101,10 @@ func (s *containerResourceSyncer) updateContainerResources(pObj, vObj *corev1.Po
 		}
 
 		requests := vObj.Spec.Containers[i].Resources.Requests
-		cpu = fmt.Sprintf("hostCluster.requests.%s.cpu", c.Name)
-		memory = fmt.Sprintf("hostCluster.requests.%s.memory", c.Name)
-		storage = fmt.Sprintf("hostCluster.requests.%s.storage", c.Name)
-		ephemeralStorage = fmt.Sprintf("hostCluster.requests.%s.ephemeral-storage", c.Name)
+		cpu = fmt.Sprintf("requests.cpu.%s", c.Name)
+		memory = fmt.Sprintf("requests.memory.%s", c.Name)
+		storage = fmt.Sprintf("requests.storage.%s", c.Name)
+		ephemeralStorage = fmt.Sprintf("requests.ephemeral-storage.%s", c.Name)
 
 		if requests == nil || requests.Cpu() == nil || requests.Cpu().IsZero() {
 			updateMap(updated.Annotations, cpu, c.Resources.Requests.Cpu().String(), b)
@@ -129,5 +129,12 @@ func (s *containerResourceSyncer) updateContainerResources(pObj, vObj *corev1.Po
 func updateMap(strMap map[string]string, key, value string, b *monotonicBool) {
 	_, found := strMap[key]
 	b.modified = !found || b.modified
-	strMap[key] = value
+	strMap[toValidDnsName(key)] = value
+}
+
+func toValidDnsName(v string) string {
+	if len(v) > 63 {
+		v = v[:63]
+	}
+	return v
 }
