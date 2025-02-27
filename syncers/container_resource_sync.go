@@ -2,16 +2,15 @@ package syncers
 
 import (
 	"fmt"
-
-	"github.com/loft-sh/vcluster-sdk/syncer"
-	synccontext "github.com/loft-sh/vcluster-sdk/syncer/context"
-	"github.com/loft-sh/vcluster-sdk/syncer/translator"
+	synccontext "github.com/loft-sh/vcluster/pkg/controllers/syncer/context"
+	"github.com/loft-sh/vcluster/pkg/controllers/syncer/translator"
+	"github.com/loft-sh/vcluster/pkg/types"
 	corev1 "k8s.io/api/core/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func NewContainerResourceSyncer(ctx *synccontext.RegisterContext) syncer.Syncer {
+func NewContainerResourceSyncer(ctx *synccontext.RegisterContext) types.Base {
 	return &containerResourceSyncer{
 		NamespacedTranslator: translator.NewNamespacedTranslator(ctx, "pod", &corev1.Pod{}),
 	}
@@ -30,7 +29,7 @@ func (s *containerResourceSyncer) Resource() client.Object {
 	return &corev1.Pod{}
 }
 
-var _ syncer.Starter = &containerResourceSyncer{}
+var _ types.Starter = &containerResourceSyncer{}
 
 func (s *containerResourceSyncer) ReconcileStart(ctx *synccontext.SyncContext, req ctrl.Request) (bool, error) {
 	return false, nil
