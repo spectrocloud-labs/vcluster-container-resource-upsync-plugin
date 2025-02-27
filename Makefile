@@ -11,8 +11,8 @@ GOOS ?= $(shell go env GOOS)
 GOARCH ?= $(shell go env GOARCH)
 GOPATH ?= $(shell go env GOPATH)
 
-IMG_TAG ?= "latest"
-IMG_NAME ?= "quay.io/spectrocloud-labs/vcluster-container-resource-upsync-plugin:${IMG_TAG}"
+IMG_TAG ?= "v0.0.4"
+IMG_NAME ?= "us-docker.pkg.dev/palette-images/palette/vcluster-container-resource-upsync-plugin:${IMG_TAG}"
 
 GOLANGCI_VERSION ?= 1.46.2
 
