@@ -1,5 +1,5 @@
 # Build the manager binary
-FROM --platform=linux/amd64 golang:1.19 as builder
+FROM us-docker.pkg.dev/palette-images/build-base-images/golang:1.22-alpine as builder
 
 # Make sure we use go modules
 WORKDIR /
@@ -8,18 +8,17 @@ WORKDIR /
 COPY . .
 
 # Install dependencies
-RUN go mod vendor
+RUN go mod download
 
 # Build cmd
-RUN CGO_ENABLED=0 GO111MODULE=on go build -mod vendor -o /plugin main.go
+RUN CGO_ENABLED=0 GO111MODULE=on go build -o /plugin main.go
 
-# final image
-FROM --platform=linux/amd64 gcr.io/distroless/static:nonroot
-USER 65532:65532
+# we use alpine for easier debugging
+FROM alpine
 
 # Set root path as working directory
 WORKDIR /
 
-COPY --from=builder /plugin .
+RUN mkdir -p /plugin
 
-ENTRYPOINT ["/plugin"]
+COPY --from=builder /plugin /plugin/plugin
