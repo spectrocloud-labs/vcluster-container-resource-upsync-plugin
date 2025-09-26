@@ -2,24 +2,19 @@ package syncers
 
 import (
 	"fmt"
-	synccontext "github.com/loft-sh/vcluster/pkg/controllers/syncer/context"
-	"github.com/loft-sh/vcluster/pkg/controllers/syncer/translator"
-	"github.com/loft-sh/vcluster/pkg/types"
+
+	"github.com/loft-sh/vcluster/pkg/syncer/synccontext"
+	syncertypes "github.com/loft-sh/vcluster/pkg/syncer/types"
 	corev1 "k8s.io/api/core/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-func NewContainerResourceSyncer(ctx *synccontext.RegisterContext) types.Base {
-	return &containerResourceSyncer{
-		NamespacedTranslator: translator.NewNamespacedTranslator(ctx, "pod", &corev1.Pod{}),
-	}
+func NewContainerResourceSyncer(ctx *synccontext.RegisterContext) syncertypes.Base {
+	return &containerResourceSyncer{}
 }
 
-type containerResourceSyncer struct {
-	// implicitly uses default PhysicalToVirtual & VirtualToPhysical implementations
-	translator.NamespacedTranslator
-}
+type containerResourceSyncer struct{}
 
 func (s *containerResourceSyncer) Name() string {
 	return "container-resource-syncer"
@@ -29,19 +24,20 @@ func (s *containerResourceSyncer) Resource() client.Object {
 	return &corev1.Pod{}
 }
 
-var _ types.Starter = &containerResourceSyncer{}
-
-func (s *containerResourceSyncer) ReconcileStart(ctx *synccontext.SyncContext, req ctrl.Request) (bool, error) {
-	return false, nil
+func (s *containerResourceSyncer) Syncer() syncertypes.Sync[client.Object] {
+	return &containerResourceSync{}
 }
 
-func (s *containerResourceSyncer) ReconcileEnd() {
-	// NOOP
+type containerResourceSync struct{}
+
+func (s *containerResourceSync) SyncToHost(ctx *synccontext.SyncContext, event *synccontext.SyncToHostEvent[client.Object]) (ctrl.Result, error) {
+	// This syncer only works on physical to virtual sync, so we don't need to implement this
+	return ctrl.Result{}, nil
 }
 
-func (s *containerResourceSyncer) Sync(ctx *synccontext.SyncContext, pObj client.Object, vObj client.Object) (ctrl.Result, error) {
-	pPod := pObj.(*corev1.Pod)
-	vPod := vObj.(*corev1.Pod)
+func (s *containerResourceSync) Sync(ctx *synccontext.SyncContext, event *synccontext.SyncEvent[client.Object]) (ctrl.Result, error) {
+	pPod := event.Host.(*corev1.Pod)
+	vPod := event.Virtual.(*corev1.Pod)
 
 	updated := s.updateContainerResources(pPod, vPod)
 	if updated == nil {
@@ -51,28 +47,24 @@ func (s *containerResourceSyncer) Sync(ctx *synccontext.SyncContext, pObj client
 
 	err := ctx.VirtualClient.Update(ctx.Context, updated)
 	if err == nil {
-		ctx.Log.Infof("updated pod %s/%s", vObj.GetNamespace(), vObj.GetName())
+		ctx.Log.Infof("updated pod %s/%s", vPod.GetNamespace(), vPod.GetName())
 	} else {
-		err = fmt.Errorf("failed to update pod %s/%s: %v", vObj.GetNamespace(), vObj.GetName(), err)
+		err = fmt.Errorf("failed to update pod %s/%s: %v", vPod.GetNamespace(), vPod.GetName(), err)
 	}
 
 	return ctrl.Result{}, err
 }
 
-func (s *containerResourceSyncer) SyncDown(ctx *synccontext.SyncContext, vObj client.Object) (ctrl.Result, error) {
+func (s *containerResourceSync) SyncToVirtual(ctx *synccontext.SyncContext, event *synccontext.SyncToVirtualEvent[client.Object]) (ctrl.Result, error) {
+	// This syncer only works on physical to virtual sync, so we don't need to implement this
 	return ctrl.Result{}, nil
-}
-
-// IsManaged determines if a physical object is managed by the vcluster
-func (s *containerResourceSyncer) IsManaged(pObj client.Object) (bool, error) {
-	return false, nil
 }
 
 type monotonicBool struct {
 	modified bool
 }
 
-func (s *containerResourceSyncer) updateContainerResources(pObj, vObj *corev1.Pod) *corev1.Pod {
+func (s *containerResourceSync) updateContainerResources(pObj, vObj *corev1.Pod) *corev1.Pod {
 	updated := vObj.DeepCopy()
 	if updated.Annotations == nil {
 		updated.Annotations = map[string]string{}

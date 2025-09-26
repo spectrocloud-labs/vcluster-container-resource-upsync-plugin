@@ -11,7 +11,7 @@ GOOS ?= $(shell go env GOOS)
 GOARCH ?= $(shell go env GOARCH)
 GOPATH ?= $(shell go env GOPATH)
 
-IMG_TAG ?= "v0.0.4"
+IMG_TAG ?= "v0.0.5"
 IMG_NAME ?= "us-docker.pkg.dev/palette-images/palette/vcluster-container-resource-upsync-plugin:${IMG_TAG}"
 
 GOLANGCI_VERSION ?= 1.46.2
