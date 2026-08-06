@@ -25,7 +25,7 @@ COVER_PKGS=$(shell go list ./... | grep -vE 'tests|api|fake|cmd|hack|config|test
 all: build ## Generate all
 
 build: tidy
-	CGO_ENABLED=0 GO111MODULE=on go build -mod vendor -o ./bin/container-resource-upsync-plugin main.go
+	CGO_ENABLED=0 GO111MODULE=on go build -o ./bin/container-resource-upsync-plugin main.go
 
 bin-dir:
 	test -d $(BIN_DIR) || mkdir $(BIN_DIR)
