@@ -123,7 +123,7 @@ require (
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/stoewer/go-strcase v1.3.0 // indirect
 	github.com/tcnksm/go-gitconfig v0.1.2 // indirect
-	github.com/ulikunitz/xz v0.5.12 // indirect
+	github.com/ulikunitz/xz v0.5.15 // indirect
 	github.com/vmware-labs/yaml-jsonpath v0.3.2 // indirect
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
@@ -180,7 +180,7 @@ require (
 	k8s.io/kube-proxy v0.33.0 // indirect
 	k8s.io/kubectl v0.33.1 // indirect
 	k8s.io/kubelet v0.33.1 // indirect
-	k8s.io/kubernetes v1.33.0 // indirect
+	k8s.io/kubernetes v1.33.6 // indirect
 	k8s.io/metrics v0.33.1 // indirect
 	k8s.io/pod-security-admission v0.33.1 // indirect
 	k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738 // indirect
