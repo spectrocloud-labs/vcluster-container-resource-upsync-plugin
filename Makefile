@@ -75,6 +75,9 @@ docker: docker-build docker-push ## Tags docker image and also pushes it to cont
 docker-build: ## Builds docker image
 	docker build . --platform=linux/amd64 -t ${IMG_NAME} -f ./Dockerfile
 
+docker-build-fips: ## Builds FIPS docker image
+	docker build . --platform=linux/amd64 --build-arg CRYPTO_LIB=fips -t ${IMG_NAME} -f ./Dockerfile.fips
+
 docker-push: ## Pushes docker image to container registry
 	docker push ${IMG_NAME}
 
