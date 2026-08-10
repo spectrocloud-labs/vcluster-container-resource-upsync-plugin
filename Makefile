@@ -11,13 +11,15 @@ GOOS ?= $(shell go env GOOS)
 GOARCH ?= $(shell go env GOARCH)
 GOPATH ?= $(shell go env GOPATH)
 
-IMG_REPO ?= us-docker.pkg.dev/palette-images/palette/vcluster-container-resource-upsync-plugin
+IMG_PATH ?= palette/vcluster-container-resource-upsync-plugin
 IMG_TAG ?= v0.0.9
-# FIPS and non-FIPS images are built from the same Dockerfile and differ only
-# by the CRYPTO_LIB build arg, so they get distinct tags.
-FIPS_TAG_SUFFIX ?= -fips
+# FIPS and non-FIPS images are built from the same Dockerfile and differ only by
+# the CRYPTO_LIB build arg. As a convention the FIPS image is published to its
+# own registry project, so both share the same tag.
+IMG_REPO ?= us-docker.pkg.dev/palette-images/${IMG_PATH}
+FIPS_IMG_REPO ?= us-docker.pkg.dev/palette-images-fips/${IMG_PATH}
 IMG_NAME ?= ${IMG_REPO}:${IMG_TAG}
-FIPS_IMG_NAME ?= ${IMG_REPO}:${IMG_TAG}${FIPS_TAG_SUFFIX}
+FIPS_IMG_NAME ?= ${FIPS_IMG_REPO}:${IMG_TAG}
 
 GOLANGCI_VERSION ?= 1.46.2
 
