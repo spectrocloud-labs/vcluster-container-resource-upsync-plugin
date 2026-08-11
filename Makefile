@@ -11,8 +11,15 @@ GOOS ?= $(shell go env GOOS)
 GOARCH ?= $(shell go env GOARCH)
 GOPATH ?= $(shell go env GOPATH)
 
-IMG_TAG ?= "v0.0.5"
-IMG_NAME ?= "us-docker.pkg.dev/palette-images/palette/vcluster-container-resource-upsync-plugin:${IMG_TAG}"
+IMG_PATH ?= palette/vcluster-container-resource-upsync-plugin
+IMG_TAG ?= v0.0.9
+# FIPS and non-FIPS images are built from the same Dockerfile and differ only by
+# the CRYPTO_LIB build arg. As a convention the FIPS image is published to its
+# own registry project, so both share the same tag.
+IMG_REPO ?= us-docker.pkg.dev/palette-images/${IMG_PATH}
+FIPS_IMG_REPO ?= us-docker.pkg.dev/palette-images-fips/${IMG_PATH}
+IMG_NAME ?= ${IMG_REPO}:${IMG_TAG}
+FIPS_IMG_NAME ?= ${FIPS_IMG_REPO}:${IMG_TAG}
 
 GOLANGCI_VERSION ?= 1.46.2
 
@@ -25,7 +32,7 @@ COVER_PKGS=$(shell go list ./... | grep -vE 'tests|api|fake|cmd|hack|config|test
 all: build ## Generate all
 
 build: tidy
-	CGO_ENABLED=0 GO111MODULE=on go build -mod vendor -o ./bin/container-resource-upsync-plugin main.go
+	CGO_ENABLED=0 GO111MODULE=on go build -o ./bin/container-resource-upsync-plugin main.go
 
 bin-dir:
 	test -d $(BIN_DIR) || mkdir $(BIN_DIR)
@@ -72,11 +79,24 @@ test: test-unit gocovmerge gocover ## Run unit tests and generate a test report
 
 docker: docker-build docker-push ## Tags docker image and also pushes it to container registry
 
+docker-fips: docker-build-fips docker-push-fips ## Tags FIPS docker image and also pushes it to container registry
+
+docker-all: docker docker-fips ## Builds and pushes both the non-FIPS and the FIPS image
+
 docker-build: ## Builds docker image
 	docker build . --platform=linux/amd64 -t ${IMG_NAME} -f ./Dockerfile
+
+docker-build-fips: ## Builds FIPS docker image (same Dockerfile, CRYPTO_LIB=fips)
+	docker build . --platform=linux/amd64 --build-arg CRYPTO_LIB=fips -t ${FIPS_IMG_NAME} -f ./Dockerfile
 
 docker-push: ## Pushes docker image to container registry
 	docker push ${IMG_NAME}
 
+docker-push-fips: ## Pushes FIPS docker image to container registry
+	docker push ${FIPS_IMG_NAME}
+
 docker-rmi: ## Remove the local docker image
 	docker rmi ${IMG_NAME}
+
+docker-rmi-fips: ## Remove the local FIPS docker image
+	docker rmi ${FIPS_IMG_NAME}
